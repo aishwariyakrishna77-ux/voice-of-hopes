@@ -395,7 +395,7 @@ function createEditInput(labelElement) {
 
 function makeEditIcon() {
   const img = document.createElement("img");
-  img.src = "images/icons8-pencil-drawing-48.png";
+  img.src = "icons8-pencil-drawing-48.png";
   img.alt = "Edit";
   img.width = 24;
   img.height = 24;
