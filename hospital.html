@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title class="page-title" id="pageTitle">Hospital</title>
+    <link rel="icon" href="\images\icons8-microphone-100.png" type="image/x-icon">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .hospital-page {
+            min-height: 100vh;
+            color: white;
+            padding-top: 100px;
+        }
+
+        .hospital-page .page-title {
+            text-align: center;
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 30px;
+            letter-spacing: 1px;
+        }
+
+        .hospital-page .hospital-box {
+            max-width: 800px;
+            margin: 0 auto;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 0 30px rgba(157, 20, 212, 0.35);
+        }
+
+        .hospital-page .hospital-box p {
+            font-size: 1.1rem;
+            line-height: 1.8;
+            margin-bottom: 15px;
+        }
+
+        .speech-controls {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin: 0 auto 24px;
+            max-width: 800px;
+        }
+
+        .speech-controls label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: white;
+            font-weight: 600;
+        }
+
+        .speech-controls select {
+            min-width: 180px;
+            max-height: 180px;
+            overflow-y: auto;
+        }
+
+        .translation-panel {
+            max-width: 800px;
+            margin: 0 auto 30px;
+            padding: 24px;
+            background: rgba(106, 7, 149, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 16px;
+        }
+
+        .translation-panel h2 {
+            font-size: 1.35rem;
+            margin-bottom: 18px;
+        }
+
+        .translation-panel p {
+            margin-bottom: 12px;
+            overflow-wrap: anywhere;
+        }
+
+        .translation-panel strong {
+            color: #ffd166;
+        }
+
+        #verificationResult {
+            font-weight: 600;
+        }
+
+        .translation-warning {
+            margin: 18px 0;
+            padding: 12px 14px;
+            color: #fff3cd;
+            background: rgba(255, 193, 7, 0.12);
+            border: 1px solid rgba(255, 193, 7, 0.45);
+            border-radius: 8px;
+        }
+
+        #verifyTranslationButton {
+            margin: 8px 0 16px;
+        }
+        @media (max-width: 576px) {
+    .translation-panel {
+        margin-left: 15px;
+        margin-right: 15px;
+        padding: 18px;
+    }
+    @media (max-width: 576px) {
+    .speech-controls {
+        width: calc(100% - 30px);
+        margin-left: auto;
+        margin-right: auto;
+        gap: 10px;
+    }
+}
+}
+    </style>
+</head>
+<body>
+    <header>
+        <nav class="navbar navbar-expand-lg navbar-light bg-light">
+            <div class="container-fluid">
+                        <a class="navbar-brand d-flex align-items-center" href="index.html">
+                    <img src="\images\icons8-arrow-left-48.png" alt="Back" width="30" height="24" class="d-inline-block align-text-top me-2">
+                    <span id="hospitalName">Hospital</span>
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav ms-auto align-items-lg-center">
+        <li class="nav-item">
+          <a class="nav-link active" href="index.html">Home</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="index.html#about">About</a>
+        </li>
+        
+        <li class="nav-item">
+          <a class="nav-link" href="index.html#contact">Contact</a>
+        </li>
+        <li>
+          <form class="d-flex ms-lg-3">
+            <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" id="search">
+            <button class="btn btn-outline-success" type="submit">Search</button>
+          </form>
+        </li>
+        <li class="nav-item ms-lg-2 mt-2 mt-lg-0">
+          <button type="button" class="btn btn-outline-warning" id="createButtonBtn">Create Button</button>
+        </li>
+      </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main class="hospital-page">
+        
+
+        <div class="speech-controls" aria-label="Speech settings">
+            <label for="languageSelect">
+                Language
+                <select class="form-select" id="languageSelect" aria-label="Choose language">
+                    <option>Loading languages...</option>
+                </select>
+            </label>
+            <label for="voiceSelect">
+                Voice
+                <select class="form-select" id="voiceSelect" aria-label="Choose voice">
+                    <option>Loading voices...</option>
+                </select>
+            </label>
+        </div>
+        <div id="translationResult" role="status" aria-live="polite"></div>
+
+        <section class="translation-panel" aria-labelledby="verificationTitle">
+            <h2 id="verificationTitle">Back-translation check</h2>
+            <p><strong>Original English:</strong> <span id="originalText">Click a phrase below to begin.</span></p>
+            <p><strong>Translated text:</strong> <span id="translatedText">No translation yet.</span></p>
+            <div class="translation-warning">
+                &#9888; <strong>Please be aware before use:</strong><br>
+                Translations are automatically generated and may contain errors or inaccuracies.
+                Please verify the translated text before using it and try to give morethan one word for better experience.
+                It's purely user's risk
+            </div>
+            
+            <button type="button" class="btn btn-outline-warning" id="verifyTranslationButton" disabled>
+                Verify Translation
+            </button>
+            <p><strong>Translated English:</strong> <span id="backTranslatedText">Not checked yet.</span></p>
+            <p id="verificationResult" role="status" aria-live="polite">Not checked yet.</p>
+        </section>
+
+        <div class="container" id="hospitalList">
+            <div class="row g-4 g-lg-6"></div>
+        </div>
+    </main>
+
+    <div id="inputPromptModal" class="custom-modal">
+        <div class="custom-modal-content">
+            <h3 id="promptTitle">Enter a name</h3>
+            <input id="promptInput" type="text" placeholder="Button name" />
+            <div class="custom-modal-actions">
+                <button type="button" id="promptCancelBtn" class="modal-btn secondary">Cancel</button>
+                <button type="button" id="promptConfirmBtn" class="modal-btn primary">Create</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <link rel="icon" href="\images\icons8-mic-24.png" type="image/x-icon">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign in | Voices of Hope</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="login.css">
+</head>
+<body>
+  <a class="back-link" href="index.html">&larr; Voices of Hope</a>
+  <main class="container" id="container">
+    <div class="form-container sign-up-container">
+      <form id="signupForm"><p class="eyebrow">VOICES OF HOPE / 01</p><h1>Create account</h1><p class="copy">Build a calmer way to communicate when words are hard to find.</p><label for="name">Name</label><input id="name" type="text" placeholder="Your name" required><label for="signup-email">Email</label><input id="signup-email" type="email" placeholder="you@example.com" required><label for="signup-password">Password</label><input id="signup-password" type="password" placeholder="At least 8 characters" minlength="8" required><button type="submit">Create account <span>&rarr;</span></button></form>
+    </div>
+    <div class="form-container sign-in-container">
+      <form id="signinForm"><p class="eyebrow">WELCOME BACK / 02</p><h1>Sign in</h1><p class="copy">Your accessible phrases are waiting for you.</p><label for="signin-email">Email</label><input id="signin-email" type="email" placeholder="you@example.com" required><label for="signin-password">Password</label><input id="signin-password" type="password" placeholder="Your password" required><a class="forgot" href="#">Forgot your password?</a><button type="submit">Sign in <span>&rarr;</span></button></form>
+    </div>
+    <div class="overlay-container"><div class="overlay"><div class="overlay-panel overlay-left"><p class="eyebrow">YOUR SPACE / 02</p><h2>Good to see<br>you again.</h2><p>Sign in to keep your essential phrases close, wherever the day takes you.</p><button class="ghost" id="signIn" type="button">Sign in</button></div><div class="overlay-panel overlay-right"><p class="eyebrow">START HERE / 01</p><h2>Make room<br>for your voice.</h2><p>Create your personal phrase space and communicate with more confidence.</p><button class="ghost" id="signUp" type="button">Create account</button></div></div></div>
+  </main>
+  <p class="note">Accessible communication, one clear phrase at a time.</p>
+  <div id="messagePopup" class="message-popup">
+    <span id="messageIcon"></span>
+    <span id="messageText"></span>
+  </div>
+  <div id="inputPromptModal" class="custom-modal">
+    <div class="custom-modal-content">
+        <h3 id="promptTitle">Enter a name</h3>
+        <input id="promptInput" type="text" placeholder="Button name" />
+        <div class="custom-modal-actions">
+            <button type="button" id="promptCancelBtn" class="modal-btn secondary">Cancel</button>
+            <button type="button" id="promptConfirmBtn" class="modal-btn primary">Create</button>
+        </div>
+    </div>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase.js"></script>
+<script src="login.js"></script>
+</body>
+</html>
