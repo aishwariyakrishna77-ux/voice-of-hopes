@@ -364,9 +364,14 @@ function saveCreatedButtonNames(names) {
   localStorage.setItem(createdButtonsStorageKey, JSON.stringify(names));
 }
 
-function openHospitalPage(buttonName) {
+function openHospitalPage(buttonName, hospitalKey = null) {
   const safeName = encodeURIComponent((buttonName || "").trim());
-  window.location.href = "hospital.html?name=" + safeName;
+  const safeKey = encodeURIComponent(
+    (hospitalKey || buttonName || "").trim()
+  );
+
+  window.location.href =
+    "hospital.html?name=" + safeName + "&key=" + safeKey;
 }
 
 function updateSavedButtonName(oldName, newName) {
@@ -395,7 +400,7 @@ function createEditInput(labelElement) {
 
 function makeEditIcon() {
   const img = document.createElement("img");
-  img.src = "icons8-pencil-drawing-48.png";
+  img.src = "images/icons8-pencil-drawing-48.png";
   img.alt = "Edit";
   img.width = 24;
   img.height = 24;
@@ -433,7 +438,18 @@ function makeEditIcon() {
       event.stopPropagation();
       return;
     }
-    openHospitalPage(label.textContent.trim() || glowButton.dataset.name || buttonName);
+
+    const displayName =
+      label.textContent.trim() ||
+      glowButton.dataset.name ||
+      buttonName;
+
+    const hospitalKey =
+      glowButton.dataset.originalName ||
+      glowButton.dataset.id ||
+      buttonName;
+
+    openHospitalPage(displayName, hospitalKey);
   });
 
   const editButton = document.createElement("button");
@@ -557,8 +573,9 @@ function saveHospitalButtonNames(names) {
   localStorage.setItem(key, JSON.stringify(names));
 }
 
-function addHospitalButtonToPage(buttonName) {
+function addHospitalButtonToPage(buttonName, buttonId = null) {
   const list = document.querySelector("#hospitalList .row");
+
   if (!list) {
     return;
   }
@@ -570,6 +587,7 @@ function addHospitalButtonToPage(buttonName) {
   glowButton.type = "button";
   glowButton.className = "glow-button";
   glowButton.dataset.name = buttonName;
+  glowButton.dataset.id = buttonId || "";
 
   const gradient = document.createElement("div");
   gradient.className = "gradient";
@@ -585,7 +603,10 @@ function addHospitalButtonToPage(buttonName) {
       event.stopPropagation();
       return;
     }
-    const buttonText = label.textContent.trim() || glowButton.dataset.name || buttonName;
+    const buttonText =
+      label.textContent.trim() ||
+      glowButton.dataset.name ||
+      buttonName;
     translateAndSpeakText(buttonText);
   });
 
@@ -595,64 +616,129 @@ function addHospitalButtonToPage(buttonName) {
   editButton.setAttribute("aria-label", "Edit text");
   editButton.appendChild(makeEditIcon());
 
-  editButton.addEventListener("click", function () {
+  editButton.addEventListener("click", async function () {
+
     const currentBox = editButton.closest(".edit-box");
+
     if (!currentBox) {
       return;
     }
 
+    // =========================
+    // SAVE EDIT
+    // =========================
     if (currentBox.classList.contains("editing")) {
+
       const editingInput = currentBox.querySelector(".edit-input");
+
       if (!editingInput) {
         return;
       }
 
       const newText = editingInput.value.trim();
+
       if (!newText) {
         editingInput.focus();
         return;
       }
 
-      const originalName = editButton.dataset.originalName || label.textContent.trim();
+      if (!buttonId) {
+        showMessage("This button is not connected to the database.", "error");
+        return;
+      }
+
+      const {
+        data: { user },
+        error: userError
+      } = await supabaseClient.auth.getUser();
+
+      if (userError || !user) {
+        console.error("User error:", userError);
+        showMessage("Please login again.", "info");
+        return;
+      }
+
+      const { error } = await supabaseClient
+        .from("custom_buttons")
+        .update({
+          button_name: newText
+        })
+        .eq("id", buttonId)
+        .eq("user_id", user.id);
+
+      if (error) {
+        console.error("Error updating Hospital button:", error);
+        showMessage(
+          "Could not save the button: " + error.message,
+          "error"
+        );
+        return;
+      }
+
+      // Update the screen
       label.textContent = newText;
       glowButton.dataset.name = newText;
-      editingInput.replaceWith(label);
 
-      const hospitalNames = getHospitalButtonNames();
-      const updatedNames = hospitalNames.map(function (name) {
-        return ((name || "").trim() === (originalName || "").trim()) ? newText : name;
-      });
-      saveHospitalButtonNames(updatedNames);
+      editingInput.replaceWith(label);
 
       currentBox.classList.remove("editing");
       editButton.classList.remove("save-btn");
+
       editButton.innerHTML = "";
       editButton.appendChild(makeEditIcon());
+
       editButton.setAttribute("aria-label", "Edit text");
+
       return;
     }
 
+    // =========================
+    // START EDIT
+    // =========================
+
     const input = createEditInput(label);
-    editButton.dataset.originalName = label.textContent.trim();
+
     label.replaceWith(input);
 
     currentBox.classList.add("editing");
     editButton.classList.add("save-btn");
+
     editButton.textContent = "Save";
     editButton.setAttribute("aria-label", "Save text");
+
     input.focus();
   });
 
   wrapper.appendChild(glowButton);
   wrapper.appendChild(editButton);
+
   list.appendChild(wrapper);
 }
 
 async function createHospitalButton() {
+  if (typeof supabaseClient === "undefined") {
+    console.error("Supabase client is not available.");
+    showMessage("The button service is unavailable right now.", "error");
+    return;
+  }
+
+  const { data: { user }, error: userError } = await supabaseClient.auth.getUser();
+
+  if (userError) {
+    console.error("Error getting logged-in user:", userError);
+    showMessage("Unable to check your login.", "error");
+    return;
+  }
+
+  if (!user) {
+    showMessage("Please login first to create a button.", "info");
+    return;
+  }
+
   const buttonName = await showInputPrompt({
-    titleText: "Add a hospital button",
-    placeholder: "Enter a button name",
-    confirmText: "Add"
+    titleText: "Create a button",
+    placeholder: "Enter a name for the button",
+    confirmText: "Create"
   });
 
   if (!buttonName || !buttonName.trim()) {
@@ -660,13 +746,32 @@ async function createHospitalButton() {
   }
 
   const trimmedName = buttonName.trim();
-  const savedNames = getHospitalButtonNames();
-  if (!savedNames.includes(trimmedName)) {
-    savedNames.push(trimmedName);
-    saveHospitalButtonNames(savedNames);
+
+  const params = new URLSearchParams(window.location.search);
+  const hospitalKey = params.get("key") || params.get("name") || "Hospital";
+
+  const { data, error } = await supabaseClient
+    .from("custom_buttons")
+    .insert({
+      user_id: user.id,
+      button_name: trimmedName,
+      page_name: "Hospital:" + hospitalKey
+    })
+    .select()
+    .single();
+
+  if (error) {
+    console.error("Error creating Hospital button:", error);
+    showMessage("Could not create button: " + error.message, "error");
+    return;
   }
 
-  addHospitalButtonToPage(trimmedName);
+  addHospitalButtonToPage(
+    data.button_name,
+    data.id
+  );
+
+  console.log("Hospital button created successfully:", data);
 }
 
 async function createButton() {
@@ -767,21 +872,55 @@ document.addEventListener("DOMContentLoaded", function () {
       createButtonBtn.addEventListener("click", createHospitalButton);
     }
 
-    const hospitalNames = getHospitalButtonNames();
-    const defaultHospitalNames = ["Doctor", "Emergency", "ICU", "Lab", "Pharmacy"];
-    const cleanedNames = hospitalNames.filter(function (name) {
-      return !defaultHospitalNames.includes((name || "").trim());
-    });
+    async function loadHospitalButtons() {
+      if (typeof supabaseClient === "undefined") {
+        console.error("Supabase client is not available.");
+        return;
+      }
 
-    if (cleanedNames.length !== hospitalNames.length) {
-      saveHospitalButtonNames(cleanedNames);
-    }
+      const { data: { user }, error: userError } =
+        await supabaseClient.auth.getUser();
 
-    if (cleanedNames.length) {
-      cleanedNames.forEach(function (name) {
-        addHospitalButtonToPage(name);
+      if (userError) {
+        console.error("Error getting logged-in user:", userError);
+        return;
+      }
+
+      if (!user) {
+        console.log("No user logged in.");
+        return;
+      }
+
+      const params = new URLSearchParams(window.location.search);
+
+      const hospitalName = params.get("name") || "Hospital";
+      const hospitalKey = params.get("key") || hospitalName;
+
+      const pageName = "Hospital:" + hospitalKey;
+
+      const { data, error } = await supabaseClient
+        .from("custom_buttons")
+        .select("*")
+        .eq("user_id", user.id)
+        .eq("page_name", pageName)
+        .order("created_at", { ascending: true });
+
+      if (error) {
+        console.error("Error loading Hospital buttons:", error);
+        return;
+      }
+
+      console.log("Hospital buttons from Supabase:", data);
+
+      data.forEach(function (button) {
+        addHospitalButtonToPage(
+          button.button_name,
+          button.id
+        );
       });
     }
+
+    loadHospitalButtons();
 
     const params = new URLSearchParams(window.location.search);
     const pageName = params.get("name");
